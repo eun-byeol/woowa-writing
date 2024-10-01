@@ -2,15 +2,11 @@
 
 # 1. 로그
 
----
-
 로그(log)란 시스템이나 애플리케이션에서 발생하는 사건이나 상태를 기록한 데이터를 의미합니다. 로깅(logging)은 로그를 수집하는 행위입니다.
 개발에서 로깅은 중요합니다. 특히, 에러 상황을 빠르게 인지하고 디버깅하는데 용이합니다. 이밖에도 성능 분석, 이상 탐지, 사용자 행동 분석 등 보안과 비즈니스에도 활용될 수 있습니다.
 오디 앱을 개발하면서 경험한 로깅과 모니터링 구축 과정을 공유하겠습니다.
 
 # 2. 로그 데이터 수집
-
----
 
 오디 앱 개발 단계에서의 로그 데이터 용도는 디버깅과 성능 분석이었습니다. 특히 AN과 BE가 함께 QA 하는 과정에서 적절한 로그를 남길 필요성을 느꼈습니다. 정상/비정상적인 데이터를 담아 요청할 때, 예상치 못한
 에러를 발견하는 경우가 많았습니다. 이 때마다 IDE에서 디버깅 모드로 실행시켜 에러 상황을 재연해야 했습니다. 따라서 기본적으로 API로 들어오는 Request와 Response를 로깅하기로 했습니다.
@@ -131,14 +127,12 @@ filterChain.doFilter 이후 `responseWrapper.copyBodyToResponse();` 를 반드�
 
 <figure>
     <img src="image/4-6.png" alt="4-6.png">
-    <figcaption>Response body가 없습니다.</figcaption>
+    <figcaption>사진에서 Response body가 없습니다.</figcaption>
 </figure>
 
+
 Interceptor 코드입니다.
-
-Filter를 통해 Wapper 된 Request, Response를 다시 ContentCachingXXXWrapper로 캐스팅하고,
-
-`new String(xxxWrapper.getContentAsByteArray())` 로 캐싱된 body를 출력합니다.
+Filter를 통해 Wapper 된 Request, Response를 다시 ContentCachingXXXWrapper로 캐스팅하고, `new String(xxxWrapper.getContentAsByteArray())` 로 캐싱된 body를 출력합니다.
 
 ```java
 
@@ -187,6 +181,7 @@ Interceptor에서 요청과 응답 body를 한번에 로깅할 수 있습니다.
     <figcaption>출처 : https://gngsn.tistory.com/153</figcaption>
 </figure>
 
+
 그림에서 doFilter가 2번 쓰여있는데, doFilter가 2번 호출되는 건가 싶었는데, 아니었습니다. doFilter 코드 내에서 재귀 호출이 일어납니다.
 
 `filterChain.doFilter()` 전에는 DispatcherServlet을 거치기 전 (1)doFilter 코드가 수행되고 후에는 DispatcherServlet을 거친 후 (2)doFilter 코드가
@@ -198,7 +193,7 @@ Interceptor에서 요청과 응답 body를 한번에 로깅할 수 있습니다.
 @Override
 public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
         throws IOException, ServletException {
-    **System.out.println(">>>> Filter - doFilter");**
+    System.out.println(">>>> Filter - doFilter");
     ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(
            (HttpServletRequest) servletRequest
     );
@@ -207,7 +202,7 @@ public void doFilter(ServletRequest servletRequest, ServletResponse servletRespo
     );
     filterChain.doFilter(requestWrapper, responseWrapper); // 요청을 다음 Filter나 서블릿에 전달
     responseWrapper.copyBodyToResponse(); // Copy the complete cached body content to the response.
-    **System.out.println("<<<< Filter - doFilter");**
+    System.out.println("<<<< Filter - doFilter");
 }
     </code></pre>
 </details>
@@ -215,8 +210,6 @@ public void doFilter(ServletRequest servletRequest, ServletResponse servletRespo
 ![4-8.png](image/4-8.png)
 
 # 3. 로그 저장 및 대시보드 구축
-
----
 
 로그 데이터를 수집했다면, 어떻게 보여줄 것인지를 결정해야 합니다. 로그 대시보드를 구축하지 않으면, 모니터링을 할 때마다 매번 서버 콘솔에 접속하여 로그 파일을 열어봐야 합니다. 오디 팀에서는 지정된 IP가 아니면
 SSH로 서버 접속이 불가능한 보안 정책을 준수하고 있습니다. 따라서 어디서든 로그를 확인하려면 대시보드 구축이 필수적이었습니다.
@@ -433,6 +426,7 @@ wizard를 사용하면, 질문이 끝없이 올라옵니다. 질문에 끝까지
     <img src="image/4-14.png" alt="4-14.png">
     <figcaption>CLI 명령어 : sudo cat /opt/aws/amazon-cloudwatch-agent/bin/config.json</figcaption>
 </figure>
+
 
 `/var/logs/ody-dev-logs/ody-dev-info.log`에 있는 로그 파일을 수집한다는 의미입니다.
 
