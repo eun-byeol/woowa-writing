@@ -401,20 +401,6 @@ wget https://amazoncloudwatch-agent.s3.amazonaws.com/ubuntu/arm64/latest/amazon-
 sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
 ```
 
-### 🚨 버그 픽스
-
-아래와 같은 로그가 떠서 설치가 안 된다면, EC2 스토리지를 확인해야 합니다.
-
-```bash
-dpkg: error processing archive ./amazon-cloudwatch-agent.deb (--install):
-cannot copy extracted data for 'opt/aws/amazon-cloudwatch-agent/bin/start-amazon-cloudwatch-agent' to '/opt/aws/amazon-cloudwatch-agent/bin/start-amazon-cloudwatch-agent.dpkg-new': failed to write (No space left on device)
-dpkg-deb: error: paste subprocess was killed by signal (Broken pipe)
-Errors were encountered while processing:
- ./amazon-cloudwatch-agent.deb
-```
-
-t4g.micro에 8GBi를 사용하고 있었는데, 16GBi로 업그레이드하여 해결했습니다.
-Agent를 설치했다면, 설정을 해줘야 합니다.
 config 파일을 직접 생성하거나, wizard를 통해 생성할 수 있습니다. config 파일에 문법 실수나 오류가 있다면 동작하지 않습니다. 디버깅이 쉽지 않으니, wizard를 추천합니다.
 
 wizard를 통해 설정하는 명령어입니다.
